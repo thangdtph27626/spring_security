@@ -100,7 +100,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public Users processOAuthPostLogin(ProcessOAuthPostLoginRequest request) {
         Optional<Users> optional = userRepository.findByEmail(request.getGmail());
-        if (!optional.isPresent()) {
+        if (optional.isPresent()) {
             return optional.get();
         }
         Users user = new Users(request);

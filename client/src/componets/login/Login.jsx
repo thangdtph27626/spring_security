@@ -3,15 +3,17 @@ import { GoogleLogin, GoogleOAuthProvider } from '@react-oauth/google';
 import axios from 'axios';
 import './login.css'
 import { useDispatch } from 'react-redux';
-import AuthService from '../server/AuthServer';
+import AuthService from '../../server/AuthServer';
+import { useNavigate } from 'react-router-dom';
 
 function Login() {
 
     const dispatch = useDispatch();
+    const navigate = useNavigate() 
 
     const handleLogin = (credentialResponse) => {
         var token = credentialResponse.credential;
-        AuthService.signOauth2(dispatch, token)
+        AuthService.signOauth2(dispatch,navigate, token)
     }
 
     const [loginForm, setLoginForm] = useState({
@@ -25,7 +27,7 @@ function Login() {
     }
 
     const signIn = () => {
-        AuthService.signIn(dispatch, loginForm)
+        AuthService.signIn(dispatch,navigate, loginForm)
     }
 
     return (

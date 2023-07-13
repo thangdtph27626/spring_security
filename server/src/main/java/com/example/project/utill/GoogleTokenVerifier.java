@@ -2,9 +2,7 @@ package com.example.project.utill;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
-import java.util.Arrays;
 import java.util.Collections;
-
 import com.example.project.entity.Users;
 import com.example.project.request.ProcessOAuthPostLoginRequest;
 import com.example.project.service.UserService;
@@ -40,14 +38,12 @@ public class GoogleTokenVerifier {
     private  JsonFactory jsonFactory = new GsonFactory();
 
     public Users varifyIdToken(String token) {
-        String clientId = "test";
         GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(transport, jsonFactory)
                 .setAudience(Collections.singletonList(ClientIdGoogle))
                 .build();
         GoogleIdToken idToken = null;
         try {
             idToken = verifier.verify(token);
-            System.out.println(idToken);
         } catch (GeneralSecurityException e) {
             throw new RuntimeException(e);
         } catch (IOException e) {
@@ -58,9 +54,10 @@ public class GoogleTokenVerifier {
             String email = (String)payload.get("email");
             String fullName  = (String)payload.get("name");
             ProcessOAuthPostLoginRequest loginRequest = new ProcessOAuthPostLoginRequest(fullName, email);
-            Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, ""));
+            Users user = userService.processOAuthPostLogin(loginRequest);
+            Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, user.getPassword()));
             SecurityContextHolder.getContext().setAuthentication(authentication);
-           return  userService.processOAuthPostLogin(loginRequest);
+           return  user;
 
         } else {
             throw new IllegalArgumentException("Invalid ID token");

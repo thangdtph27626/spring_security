@@ -1,3 +1,4 @@
+import jwtDecode from 'jwt-decode'
 import React, { Component, useContext } from 'react'
 
 const AuthContext = React.createContext()
@@ -36,6 +37,15 @@ class AuthProvider extends Component {
     this.setState({ user })
   }
 
+  getRoleUser = () => {
+    var user =  localStorage.getItem('user')
+    if(user == undefined){
+      return ''
+    }
+    const decodedToken = jwtDecode(user.token);
+    return decodedToken.roles 
+  }
+
   userLogout = () => {
     localStorage.removeItem('user')
     this.setState({ user: null })
@@ -44,10 +54,10 @@ class AuthProvider extends Component {
   render() {
     const { children } = this.props
     const { user } = this.state
-    const { getUser, userIsAuthenticated, userLogin, userLogout } = this
+    const { getUser, userIsAuthenticated, userLogin, userLogout, getRoleUser } = this
 
     return (
-      <AuthContext.Provider value={{ user, getUser, userIsAuthenticated, userLogin, userLogout, }}>
+      <AuthContext.Provider value={{ user, getUser, userIsAuthenticated, userLogin, userLogout, getRoleUser,}}>
         {children}
       </AuthContext.Provider>
     )

@@ -64,6 +64,7 @@ public class Users {
         this.fullName = request.getFullName();
         this.email = request.getGmail();
         this.role = Roles.USER;
+        this.password = new BCryptPasswordEncoder().encode("");
     }
 
 }
