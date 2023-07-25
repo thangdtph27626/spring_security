@@ -9,6 +9,8 @@ import com.example.project.service.impl.UserDetailServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -16,10 +18,12 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -35,8 +39,8 @@ import java.util.Arrays;
 @EnableMethodSecurity
 public class SecurityConfig {
 
-    public String ADMIN = "MANAGE";
-    public String USER = "USER";
+    private  String ADMIN = "MANAGE";
+    private String USER = "USER";
 
     @Autowired
     public JwtTokenProvider jwtTokenProvider;
@@ -46,8 +50,8 @@ public class SecurityConfig {
         return  new JwtAuthenticationFilter();
     }
 
-    @Autowired
-    private CustomOAuth2UserService oauthUserService;
+//    @Autowired
+//    private CustomOAuth2UserService oauthUserService;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -65,10 +69,11 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/users", "/api/users/**").hasAnyAuthority(ADMIN, USER)
+                        .requestMatchers(HttpMethod.DELETE, "/api/users/**").hasAnyAuthority(ADMIN)
                         .requestMatchers("/public/**", "/auth/**", "/oauth2/**").permitAll()
                         .requestMatchers("/", "/error", "/csrf", "/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs", "/v3/api-docs/**").permitAll()
                         .anyRequest().authenticated())
-                .oauth2Login(withDefaults())
+//                .oauth2Login(withDefaults())
                 .formLogin(withDefaults())
                 .logout(l -> l.logoutSuccessUrl("/").permitAll())
 //                .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
